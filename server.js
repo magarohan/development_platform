@@ -1,14 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const fileRoutes = require('./routes');
+const fileRoutes = require('./routes/file.routes');
 const fs = require('fs');
 const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure upload directory exists
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
 app.use(express.json());

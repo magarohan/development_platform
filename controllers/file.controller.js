@@ -1,10 +1,7 @@
-const express = require('express');
 const multer = require('multer');
-const File = require('./fileModel.js');
+const File = require('../models/file.model');
 const path = require('path');
-const fs = require('fs');
 
-const router = express.Router();
 const uploadFolder = 'uploads';
 
 const storage = multer.diskStorage({
@@ -18,8 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Upload file
-router.post('/upload', upload.array('files'), async (req, res) => {
+const uploadFiles = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
@@ -42,18 +38,14 @@ router.post('/upload', upload.array('files'), async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'File upload failed', details: err.message });
   }
-});
+};
 
-
-
-// List all files
-router.get('/files', async (req, res) => {
+const listFiles = async (req, res) => {
   const files = await File.find();
   res.json(files);
-});
+};
 
-// Download by ID
-router.get('/files/id/:id', async (req, res) => {
+const downloadFileById = async (req, res) => {
   try {
     const file = await File.findById(req.params.id);
     if (!file) return res.status(404).send('File not found');
@@ -61,10 +53,9 @@ router.get('/files/id/:id', async (req, res) => {
   } catch {
     res.status(500).send('Error downloading file');
   }
-});
+};
 
-// Download by name
-router.get('/files/name/:name', async (req, res) => {
+const downloadFileByName = async (req, res) => {
   try {
     const file = await File.findOne({ filename: req.params.name });
     if (!file) return res.status(404).send('File not found');
@@ -72,6 +63,12 @@ router.get('/files/name/:name', async (req, res) => {
   } catch {
     res.status(500).send('Error downloading file');
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  upload,
+  uploadFiles,
+  listFiles,
+  downloadFileById,
+  downloadFileByName
+};
