@@ -64,8 +64,12 @@ const downloadFileById = async (req, res) => {
 
     const isOwner = file.owner?.toString() === req.user.userId;
 
-    if (!isOwner) {
+    if (file.accessLevel === 'only_me' && !isOwner) {
       return res.status(403).json({ message: 'Access denied' });
+    }
+
+    if (file.accessLevel === 'timed' && Date.now() > file.expiresAt) {
+      return res.status(403).json({ message: 'Access expired' });
     }
 
     res.download(path.resolve(file.path), file.filename);
@@ -96,10 +100,48 @@ const downloadFileByName = async (req, res) => {
   }
 };
 
+const updateAccessLevel = async (req, res) => {
+  try {
+    const file = await File.findById(req.params.id);
+    if (!file) {
+      return res.status(404).send('File not found');
+    }
+    file.accessLevel = req.body.accessLevel;
+    await file.save();
+    res.send('Access level updated successfully');
+  } catch (error) {
+    console.error('Error updating access level:', error);
+    res.status(500).send('Error updating access level');
+  }
+}
+
+const generateAccessLink = async (req, res) => {
+  try {
+    const file = await File.findById(req.params.id);
+
+    if (!file) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    if (file.accessLevel === 'public') {  
+      res.status(200).json({ link: `http://localhost:4000/files/id/${file._id}` });
+    } else if (file.accessLevel === 'timed') {
+      res.status(200).json({ link: `http://localhost:4000/files/id/${file._id}` });
+    } else {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+  } catch (error) {
+    console.error('Generate access link error:', error);
+    res.status(500).json({ message: 'Error generating access link', error });
+  }
+};
+
 module.exports = {
   upload,
   uploadFile,
   listFiles,
   downloadFileById,
-  downloadFileByName
+  downloadFileByName,
+  updateAccessLevel,
+  generateAccessLink
 };

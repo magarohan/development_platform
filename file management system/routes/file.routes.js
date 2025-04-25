@@ -7,7 +7,9 @@ const {
   uploadFile,
   listFiles,
   downloadFileById,
-  downloadFileByName
+  downloadFileByName,
+  updateAccessLevel,
+  generateAccessLink
 } = require('../controllers/file.controller');
 
 // Upload file
@@ -22,5 +24,11 @@ router.get('/id/:id',authenticate, downloadFileById);
 
 // Download by name
 router.get('/name/:name',authenticate, downloadFileByName);
+
+//update access level
+router.patch('/updateAccessLevel/:id', authenticate, updateAccessLevel);
+
+//generate access link
+router.post('/generateAccessLink/:id', authenticate, generateAccessLink);
 
 module.exports = router;

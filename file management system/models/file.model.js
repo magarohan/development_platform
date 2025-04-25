@@ -19,11 +19,20 @@ const fileSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
       },
-      // accessLevel: {
-      //   type: String,
-      //   enum: ['only_me', 'public', 'timed'],
-      //   default: 'only_me',
-      // },
+      accessLevel: {
+        type: String,
+        enum: ['only_me', 'public', 'timed'],
+        default: 'only_me',
+      },
+      expiresAt: {
+        type: Date,
+        default: null
+      },
+      accessToken: {
+        type: String,
+        unique: true,
+        sparse: true
+      }
 });
 
 module.exports = mongoose.model("File", fileSchema);
