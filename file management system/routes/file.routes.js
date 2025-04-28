@@ -13,10 +13,10 @@ const {
 } = require('../controllers/file.controller');
 
 // Upload file
-router.post('/upload', authenticate, upload.single('file'), uploadFile);
+router.post('/upload', authenticate, uploadFile);
 
 //upload to folder
-router.post('/upload/:folder', authenticate, upload.single('file'), uploadFile);
+router.post('/upload/:folder', authenticate, uploadFile);
 
 // List all files
 router.get('/list',authenticate, listFiles);

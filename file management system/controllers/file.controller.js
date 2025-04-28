@@ -1,6 +1,9 @@
 const multer = require('multer');
 const File = require('../models/file.model');
+const Folder = require('../models/folder.model');
+const Analytics = require('../models/analytics.model');
 const path = require('path');
+const fs = require('fs');
 
 // Folder to store uploads
 const uploadFolder = 'uploads';
@@ -33,6 +36,20 @@ const uploadFile = async (req, res) => {
       folder: folder || null,
       owner: req.user.userId,
     });
+
+    const analytics = await Analytics.findOne({ user: req.user.userId });
+      if (analytics) {
+        analytics.totalFilesUploaded += 1;
+        analytics.totalStorageUsed += req.file.size;
+        await analytics.save();
+      } else {
+        const newAnalytics = new Analytics({
+          user: req.user.userId,
+          totalFilesUploaded: 1,
+          totalStorageUsed: req.file.size,
+        });
+        await newAnalytics.save();
+      }
 
     res.status(201).json(newFile);
   } catch (error) {
@@ -73,6 +90,14 @@ const downloadFileById = async (req, res) => {
     }
 
     res.download(path.resolve(file.path), file.filename);
+    file.downloadCount += 1;
+    await file.save();
+
+    const analytics = await Analytics.findOne({ user: req.user.userId });
+    if (analytics) {
+      analytics.totalDownloads += 1;
+      await analytics.save();
+    }
   } catch (error) {
     console.error('Download error:', error);
     res.status(500).json({ message: 'Error downloading file', error });
@@ -91,6 +116,14 @@ const downloadFileByName = async (req, res) => {
 
     if (!isOwner) {
       return res.status(403).send('Access denied');
+    }
+    file.downloadCount += 1;
+    await file.save();
+
+    const analytics = await Analytics.findOne({ user: req.user.userId });
+    if (analytics) {
+      analytics.totalDownloads += 1;
+      await analytics.save();
     }
 
     res.download(path.resolve(file.path), file.filename);
