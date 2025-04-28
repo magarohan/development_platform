@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/user.routes');
 const fileRoutes = require('./routes/file.routes');
 const folderRoutes = require('./routes/folder.routes');
+const analyticsRoutes = require('./routes/analytics.routes')
 const fs = require('fs');
 const cors = require('cors');
 
@@ -18,6 +19,7 @@ app.use(cors());
 app.use('/users', userRoutes);
 app.use('/files', fileRoutes);
 app.use('/folders', folderRoutes);
+app.use('/analytics', analyticsRoutes)
 
 
 mongoose.connect(process.env.MONGODB_URI, {
