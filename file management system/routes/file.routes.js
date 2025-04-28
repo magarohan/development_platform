@@ -15,6 +15,8 @@ const {
 // Upload file
 router.post('/upload', authenticate, upload.single('file'), uploadFile);
 
+//upload to folder
+router.post('/upload/:folder', authenticate, upload.single('file'), uploadFile);
 
 // List all files
 router.get('/list',authenticate, listFiles);

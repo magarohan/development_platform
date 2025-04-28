@@ -137,7 +137,6 @@ const generateAccessLink = async (req, res) => {
 };
 
 module.exports = {
-  upload,
   uploadFile,
   listFiles,
   downloadFileById,
